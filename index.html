@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWLEST |</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f0f13;
+            --bg-card: #1c1c24;
+            --primary: #9d4edd;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark); 
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .bg-blur {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1506318244203-197f24102477?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-attachment: fixed;
+            filter: blur(15px);
+            opacity: 0.1; 
+            z-index: -1;
+        }
+
+        header { text-align: center; padding: 3rem 1rem 2rem; }
+        h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: 1px; color: var(--primary); }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+
+        .bot-selector { display: flex; justify-content: center; gap: 1.5rem; padding: 1rem; flex-wrap: wrap; }
+        .bot-profile { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s ease; }
+        .bot-profile:active, .bot-profile.active { transform: scale(0.95); }
+
+        .bot-logo-frame {
+            width: 70px; height: 70px; border-radius: 50%;
+            background-color: var(--bg-card); border: 2px solid transparent;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; transition: border 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .bot-img { width: 100%; height: 100%; object-fit: cover; }
+        .bot-profile.active .bot-logo-frame { border-color: var(--primary); box-shadow: 0 0 15px rgba(157, 78, 221, 0.4); }
+        .bot-name { margin-top: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+        .bot-profile.active .bot-name { color: var(--primary); }
+
+        .commands-container { flex: 1; padding: 2rem 1.5rem; max-width: 600px; margin: 0 auto; width: 100%; }
+        .commands-header { margin-bottom: 1.5rem; display: none; animation: fadeIn 0.3s ease; }
+        .commands-header h2 { font-size: 1.5rem; margin-bottom: 5px; }
+        .commands-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .open-bot-btn {
+            display: inline-block; margin-top: 10px; padding: 8px 16px;
+            background-color: var(--primary); color: white; text-decoration: none;
+            border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+        }
+
+        .command-list { display: flex; flex-direction: column; gap: 1rem; }
+        .command-item {
+            background-color: var(--bg-card); padding: 1rem 1.2rem; border-radius: 12px;
+            display: none; animation: slideUp 0.3s ease forwards; opacity: 0;
+        }
+        .cmd-code { font-family: monospace; color: var(--primary); font-size: 1.1rem; font-weight: bold; display: block; margin-bottom: 4px; }
+        .cmd-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.4; }
+        .placeholder-text { text-align: center; color: var(--text-muted); margin-top: 3rem; font-size: 0.95rem; }
+
+        footer { background-color: var(--bg-card); padding: 2rem 1rem; text-align: center; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); }
+        footer p { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; }
+        .footer-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .footer-btn {
+            background-color: var(--bg-dark); color: var(--primary); text-decoration: none;
+            padding: 0.6rem 1.2rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+            border: 1px solid rgba(157, 78, 221, 0.3); transition: background 0.2s ease;
+        }
+        .footer-btn:active, .footer-btn:hover { background-color: rgba(157, 78, 221, 0.1); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="bg-blur"></div>
+
+    <header>
+        <h1>OWLEST</h1>
+        <p class="subtitle">| Telegram Bots |</p>
+    </header>
+
+    <div class="bot-selector">
+        <div class="bot-profile" onclick="showBot('zoya', this)">
+            <div class="bot-logo-frame">
+                <img src="https://files.catbox.moe/ca5km1.jpg" class="bot-img">
+            </div>
+            <span class="bot-name">Zoya AI</span>
+        </div>
+
+        <div class="bot-profile" onclick="showBot('ghost', this)">
+            <div class="bot-logo-frame">
+                <img src="https://files.catbox.moe/amh7bp.jpg" class="bot-img">
+            </div>
+            <span class="bot-name">Ghost Zelt</span>
+        </div>
+    </div>
+
+    <div class="commands-container">
+        <div id="placeholderText" class="placeholder-text">Tap on a bot above to view its commands.</div>
+        <div id="botHeader" class="commands-header">
+            <h2 id="botTitle">Bot Name</h2>
+            <p id="botDesc">Bot Description</p>
+            <a id="botLink" href="#" target="_blank" class="open-bot-btn">Go to Bot ➔</a>
+        </div>
+        <div id="commandList" class="command-list"></div>
+    </div>
+
+    <footer>
+        <p>"Automating the chat, one script at a time."</p>
+        <div class="footer-links">
+            <a href="https://t.me/THINKOF5" target="_blank" class="footer-btn">📢 Updates Channel</a>
+            <a href="https://t.me/redvinus" target="_blank" class="footer-btn">💬 Support Group</a>
+        </div>
+    </footer>
+
+    <script>
+        const botData = {
+            zoya: {
+                title: "Zoya AI 🎀",
+                link: "https://t.me/aizoyaabot", 
+                desc: "Advanced conversational AI, economy, and group management bot.",
+                commands: [
+                    { cmd: "/start", desc: "Start bot" },
+                    { cmd: "/chat", desc: "on/off chat mode" },
+                    { cmd: "/tagall", desc: "Message tagging" },
+                    { cmd: "/stoptag", desc: "Stop tagging" },
+                    { cmd: "/rob", desc: "Reply message then rob him" },
+                    { cmd: "/bal", desc: "Check balance" },
+                    { cmd: "/stats", desc: "Check bot status" },
+                    { cmd: "/protect", desc: "Protect 1d or 2d" },
+                    { cmd: "/top", desc: "Leaderboard" },
+                    { cmd: "/welcome", desc: "On/off to welcome/Leave Message" },
+                    { cmd: "/kicks", desc: "Kick a user" },
+                    { cmd: "/punch", desc: "Give someone the heavy punch" },
+                    { cmd: "/bite", desc: "Haha.. bite someone" },
+                    { cmd: "/kiss", desc: "Umm.. kissing them" },
+                    { cmd: "/pat", desc: "Owww.. pat on reply" },
+                    { cmd: "/slap", desc: "Just slap the user" },
+                    { cmd: "/poke", desc: "Poke the user" },
+                    { cmd: "/hug", desc: "Send some love" },
+                    { cmd: "/bet", desc: "Gamble your money (e.g. /bet 100) 🎰" },
+                    { cmd: "/rps", desc: "Challenge a friend to Rock Paper Scissors ⚔️" },
+                    { cmd: "/rpsbot", desc: "Play Rock Paper Scissors against me 🤖" },
+                    { cmd: "/giveaway", desc: "See the Current event" },
+                    { cmd: "/daily", desc: "Claim daily Reward" },
+                    { cmd: "/pay", desc: "To pay anyone" },
+                    { cmd: "/wordle", desc: "Start wordle game" },
+                    { cmd: "/stopwordle", desc: "Stop wordle" },
+                    { cmd: "/thieves", desc: "Top robbers" },
+                    { cmd: "/jumble", desc: "Solve the puzzle" },
+                    { cmd: "/info", desc: "Users Info" },
+                    { cmd: "/id", desc: "Chat or user id" }
+                ]
+            },
+            ghost: {
+                title: "Ghost Zelt 👻",
+                link: "https://t.me/zletbot", 
+                desc: "Privacy-focused management and moderation userbot.",
+                commands: [
+                    { cmd: "/start", desc: "Start bot" },
+                    { cmd: "/target", desc: "Activate DM Sniper (Format: /target ChatID UserID)" },
+                    { cmd: "/untarget", desc: "Deactivate DM Sniper for a user" },
+                    { cmd: "/ghost", desc: "Toggle Anonymous Mode (ON/OFF)" }
+                ]
+            }
+        };
+
+        function showBot(botId, element) {
+            document.querySelectorAll('.bot-profile').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            document.getElementById('placeholderText').style.display = 'none';
+            document.getElementById('botHeader').style.display = 'block';
+
+            const data = botData[botId];
+            document.getElementById('botTitle').innerText = data.title;
+            document.getElementById('botDesc').innerText = data.desc;
+            document.getElementById('botLink').href = data.link; 
+
+            const listContainer = document.getElementById('commandList');
+            listContainer.innerHTML = ''; 
+
+            data.commands.forEach((cmdObj, index) => {
+                const cmdDiv = document.createElement('div');
+                cmdDiv.className = 'command-item';
+                
+                let delay = index * 0.03; 
+                cmdDiv.style.animationDelay = `${delay}s`;
+                cmdDiv.style.display = 'block';
+
+                cmdDiv.innerHTML = `
+                    <span class="cmd-code">${cmdObj.cmd}</span>
+                    <span class="cmd-desc">${cmdObj.desc}</span>
+                `;
+                listContainer.appendChild(cmdDiv);
+            });
+        }
+    </script>
+</body>
+</html>
+
