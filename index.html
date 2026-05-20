@@ -1,411 +1,598 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OWLEST |</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-dark: #0f0f13;
-            --bg-card: rgba(28, 28, 36, 0.6); /* Glass effect base */
-            --primary: #9d4edd;
-            --primary-glow: rgba(157, 78, 221, 0.5);
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OWLEST | Telegram Bots</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+body{
+  font-family:'DM Sans',sans-serif;
+  background:#08050f;
+  color:#fff;
+  min-height:100vh;
+  overflow-x:hidden;
+}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark); 
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            position: relative;
-        }
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
-        /* --- Blurry Cosmic Background --- */
-        .bg-blur {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1506318244203-197f24102477?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover;
-            background-attachment: fixed;
-            filter: blur(15px);
-            opacity: 0.15; 
-            z-index: -1;
-        }
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:0.025;pointer-events:none;z-index:9999;
+}
 
-        /* --- Header --- */
-        header {
-            text-align: center;
-            padding: 3rem 1rem 2rem;
-        }
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: var(--primary);
-            text-shadow: 0 0 15px var(--primary-glow);
-        }
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-top: 5px;
-            font-weight: 600;
-        }
+.wrap{
+  position:relative;z-index:1;
+  max-width:480px;margin:0 auto;
+  padding:0 16px 60px;
+}
 
-        /* --- Bot Selection Area --- */
-        .bot-selector {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            padding: 1rem;
-            flex-wrap: wrap;
-        }
+/* ── HERO ── */
+.hero{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:36px 0 28px;
+  overflow:hidden;
+}
 
-        .bot-profile {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
+.owl-float{
+  position:absolute;font-size:1.3rem;
+  animation:owlDrift linear infinite;
+  pointer-events:none;opacity:0.65;
+  filter:drop-shadow(0 0 8px rgba(255,140,0,0.5));
+}
+.owl-float:nth-child(1){top:6%;left:8%;animation-duration:6s;}
+.owl-float:nth-child(2){top:12%;right:8%;font-size:0.9rem;animation-duration:8s;animation-delay:-2s;}
+.owl-float:nth-child(3){top:35%;right:3%;font-size:0.8rem;animation-duration:7s;animation-delay:-4s;}
+.owl-float:nth-child(4){bottom:5%;left:4%;font-size:1rem;animation-duration:9s;animation-delay:-1s;}
+.owl-float:nth-child(5){top:3%;left:48%;font-size:0.75rem;animation-duration:10s;animation-delay:-3s;}
 
-        .bot-profile:active, .bot-profile.active {
-            transform: scale(0.95);
-        }
+@keyframes owlDrift{
+  0%,100%{transform:translateY(0) rotate(-5deg);}
+  25%{transform:translateY(-10px) rotate(5deg);}
+  75%{transform:translateY(-14px) rotate(-3deg);}
+}
 
-        .bot-logo-frame {
-            width: 75px;
-            height: 75px;
-            border-radius: 50%;
-            background-color: #111;
-            border: 2px solid transparent;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
+.purple-sphere{
+  position:absolute;top:4%;right:6%;
+  width:80px;height:80px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#c77dff,#7b2cbf 60%,#3a0068);
+  box-shadow:0 0 40px rgba(157,78,221,0.6),0 0 80px rgba(157,78,221,0.2);
+  animation:sphereFloat 6s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes sphereFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
 
-        .bot-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .bot-profile.active .bot-logo-frame {
-            border-color: var(--primary);
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
+.dot{position:absolute;border-radius:50%;pointer-events:none;animation:dotPulse 3s ease-in-out infinite;}
+.dot1{width:8px;height:8px;background:#9d4edd;bottom:12%;right:18%;box-shadow:0 0 12px #9d4edd;animation-delay:0s;}
+.dot2{width:6px;height:6px;background:#ff8c00;bottom:9%;right:12%;box-shadow:0 0 10px #ff8c00;animation-delay:-1s;}
+.dot3{width:5px;height:5px;background:#9d4edd;top:40%;left:6%;box-shadow:0 0 8px #9d4edd;animation-delay:-2s;}
 
-        .bot-name {
-            margin-top: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
+@keyframes dotPulse{0%,100%{opacity:0.5;transform:scale(1);}50%{opacity:1;transform:scale(1.5);}}
 
-        .bot-profile.active .bot-name {
-            color: var(--primary);
-            text-shadow: 0 0 10px var(--primary-glow);
-        }
+/* AVATAR */
+.avatar-wrap{
+  position:relative;
+  width:160px;height:160px;
+  margin:0 auto 18px;
+}
 
-        /* --- Showcase Display Area (Glassmorphism) --- */
-        .commands-container {
-            flex: 1;
-            padding: 1rem 1.5rem 2rem;
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
-        }
+.ring-outer{
+  position:absolute;inset:-14px;border-radius:50%;
+  border:2.5px solid transparent;
+  background:linear-gradient(135deg,#ff8c00,#ff4da6,#9d4edd,#ff8c00) border-box;
+  -webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:destination-out;mask-composite:exclude;
+  animation:ringRotate 4s linear infinite;
+}
+.ring-mid{
+  position:absolute;inset:-5px;border-radius:50%;
+  border:1px solid rgba(255,140,0,0.25);
+  animation:ringRotate 7s linear infinite reverse;
+}
+@keyframes ringRotate{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
-        .commands-header {
-            display: none; 
-            animation: fadeIn 0.4s ease forwards;
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 1.5rem;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+.avatar-img{
+  width:160px;height:160px;border-radius:50%;object-fit:cover;
+  border:3px solid #ff8c00;
+  box-shadow:0 0 36px rgba(255,140,0,0.5),0 0 70px rgba(255,140,0,0.15);
+  display:block;
+  transition:src 0.3s;
+}
 
-        .commands-header h2 {
-            font-size: 1.6rem;
-            margin-bottom: 8px;
-            color: #fff;
-        }
+/* Default avatar placeholder */
+.avatar-placeholder{
+  width:160px;height:160px;border-radius:50%;
+  background:linear-gradient(135deg,#1a1025,#2d1b4e);
+  border:3px solid rgba(157,78,221,0.4);
+  box-shadow:0 0 36px rgba(157,78,221,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;
+  animation:float3d 4s ease-in-out infinite;
+}
+@keyframes float3d{
+  0%,100%{transform:perspective(300px) rotateY(0) translateY(0);}
+  50%{transform:perspective(300px) rotateY(8deg) translateY(-6px);}
+}
 
-        .commands-header p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
+.bot-hero-name{
+  font-family:'Orbitron',sans-serif;
+  font-size:2.6rem;font-weight:900;
+  text-transform:uppercase;letter-spacing:4px;
+  color:#ff8c00;
+  text-shadow:0 0 20px rgba(255,140,0,0.9),0 0 40px rgba(255,140,0,0.4);
+  text-align:center;line-height:1;
+  margin-bottom:8px;
+  animation:nameGlow 2.5s ease-in-out infinite;
+  min-height:3.2rem;
+  transition:all 0.3s;
+}
+@keyframes nameGlow{
+  0%,100%{text-shadow:0 0 20px rgba(255,140,0,0.8),0 0 40px rgba(255,140,0,0.4);}
+  50%{text-shadow:0 0 30px rgba(255,140,0,1),0 0 60px rgba(255,140,0,0.6);}
+}
 
-        /* Tags */
-        .tags-container {
-            display: flex;
-            gap: 8px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
+.bot-hero-sub{
+  font-style:italic;font-size:0.82rem;
+  color:rgba(255,255,255,0.4);
+  text-align:center;margin-bottom:16px;
+  min-height:1.2rem;transition:all 0.3s;
+}
 
-        .tech-tag {
-            background: rgba(157, 78, 221, 0.15);
-            color: #d8b4fe;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            border: 1px solid rgba(157, 78, 221, 0.3);
-        }
+.welcome-text{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;color:rgba(255,255,255,0.6);
+  text-align:center;letter-spacing:2px;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;justify-content:center;
+}
+.welcome-dot{width:6px;height:6px;border-radius:50%;background:#ff8c00;box-shadow:0 0 8px #ff8c00;animation:dotPulse 1.5s infinite;}
 
-        /* Features List */
-        .features-box {
-            margin-top: 20px;
-            text-align: left;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 3px solid var(--primary);
-        }
+.brand-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(157,78,221,0.1);
+  border:1.5px solid rgba(157,78,221,0.4);
+  border-radius:40px;padding:9px 26px;
+  font-family:'Orbitron',sans-serif;font-size:0.8rem;font-weight:700;
+  color:#c77dff;letter-spacing:3px;text-decoration:none;
+  box-shadow:0 0 20px rgba(157,78,221,0.15);
+  transition:all 0.3s;cursor:pointer;
+}
+.brand-btn:hover{background:rgba(157,78,221,0.2);transform:translateY(-2px);}
 
-        .features-box h4 {
-            color: var(--primary);
-            margin-bottom: 12px;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+/* ── BOT SELECTOR ── */
+.section-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;color:rgba(255,255,255,0.3);
+  letter-spacing:3px;text-transform:uppercase;
+  text-align:center;margin:20px 0 14px;
+}
 
-        .features-list {
-            color: #cbd5e1;
-            font-size: 0.9rem;
-            line-height: 1.7;
-            padding-left: 20px;
-        }
+.bot-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;margin-bottom:20px;perspective:1000px;
+}
 
-        .features-list li {
-            margin-bottom: 8px;
-        }
+.bot-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:16px;padding:16px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+  cursor:pointer;
+  transition:box-shadow 0.3s,border-color 0.3s,transform 0.2s;
+  position:relative;overflow:hidden;
+  transform-style:preserve-3d;will-change:transform;
+}
 
-        .open-bot-btn {
-            display: block;
-            width: 100%;
-            text-align: center;
-            margin-top: 20px;
-            padding: 14px;
-            background: linear-gradient(135deg, #9d4edd, #7b2cbf);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 800;
-            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
-            transition: transform 0.2s;
-        }
+.bot-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(255,140,0,0.1),transparent 70%);
+  opacity:0;transition:opacity 0.3s;
+}
 
-        .open-bot-btn:active {
-            transform: scale(0.98);
-        }
+.bot-card.active{
+  border-color:#ff8c00;
+  box-shadow:0 0 20px rgba(255,140,0,0.25),0 6px 24px rgba(255,140,0,0.12);
+}
+.bot-card.active::before{opacity:1;}
 
-        .placeholder-text {
-            text-align: center;
-            color: var(--text-muted);
-            margin-top: 4rem;
-            font-size: 1rem;
-            font-weight: 600;
-        }
+.avatar-scene{width:56px;height:56px;perspective:600px;}
+.avatar-flipper{
+  width:100%;height:100%;position:relative;
+  transform-style:preserve-3d;
+  transition:transform 0.7s cubic-bezier(0.34,1.56,0.64,1);
+  border-radius:50%;
+}
+.bot-card.active .avatar-flipper,
+.bot-card:hover .avatar-flipper{transform:rotateY(360deg);}
 
-        /* --- Footer --- */
-        footer {
-            background: rgba(15, 15, 19, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 2rem 1rem;
-            text-align: center;
-            margin-top: auto;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
+.avatar-front,.avatar-back{
+  position:absolute;inset:0;border-radius:50%;
+  backface-visibility:hidden;overflow:hidden;
+}
+.avatar-back{
+  transform:rotateY(180deg);
+  background:linear-gradient(135deg,#ff8c00,#9d4edd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;
+}
 
-        footer p {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-bottom: 1.2rem;
-            font-style: italic;
-        }
+.bot-avatar{
+  width:100%;height:100%;object-fit:cover;border-radius:50%;
+  border:2px solid rgba(255,140,0,0.25);
+  transition:border-color 0.3s,box-shadow 0.3s;
+}
+.bot-card.active .bot-avatar{
+  border-color:#ff8c00;
+  box-shadow:0 0 14px rgba(255,140,0,0.45);
+}
 
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
+.bot-label{
+  font-size:0.72rem;font-weight:600;
+  color:rgba(255,255,255,0.35);
+  text-align:center;transition:color 0.2s;line-height:1.3;
+}
+.bot-card.active .bot-label{color:#ff8c00;}
 
-        .footer-btn {
-            background-color: transparent;
-            color: var(--primary);
-            text-decoration: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border: 1px solid rgba(157, 78, 221, 0.4);
-            transition: all 0.2s ease;
-        }
+.active-pip{
+  position:absolute;top:7px;right:7px;
+  width:6px;height:6px;border-radius:50%;
+  background:#ff8c00;box-shadow:0 0 8px #ff8c00;
+  opacity:0;transition:opacity 0.3s;
+}
+.bot-card.active .active-pip{opacity:1;}
 
-        .footer-btn:active {
-            background-color: rgba(157, 78, 221, 0.15);
-        }
+/* ── PLACEHOLDER ── */
+.placeholder{
+  text-align:center;padding:32px 20px;
+  color:rgba(255,255,255,0.2);
+}
+.placeholder-icon{font-size:2.5rem;display:block;margin-bottom:10px;opacity:0.25;}
+.placeholder p{font-size:0.85rem;opacity:0.5;line-height:1.5;}
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+/* ── DETAIL CARD ── */
+.bot-detail{display:none;}
+.bot-detail.show{
+  display:block;
+  animation:card3dIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes card3dIn{
+  from{opacity:0;transform:perspective(800px) rotateX(16deg) translateY(24px) scale(0.96);}
+  to{opacity:1;transform:perspective(800px) rotateX(0) translateY(0) scale(1);}
+}
+
+.detail-card{
+  background:rgba(12,8,22,0.9);
+  border:1px solid rgba(255,140,0,0.18);
+  border-radius:20px;overflow:hidden;
+  backdrop-filter:blur(20px);
+  box-shadow:0 8px 36px rgba(255,140,0,0.08);
+}
+
+.detail-topbar{
+  height:2.5px;
+  background:linear-gradient(90deg,#ff8c00,#ff4da6,#9d4edd,#ff8c00);
+  background-size:200% 100%;
+  animation:shimmer 2s linear infinite;
+}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+.detail-body{padding:20px;}
+
+.detail-header{
+  display:flex;align-items:flex-start;
+  gap:14px;margin-bottom:14px;
+}
+
+.detail-avatar-wrap{
+  width:62px;height:62px;flex-shrink:0;
+  position:relative;
+  animation:floatAvatar 4s ease-in-out infinite;
+}
+@keyframes floatAvatar{
+  0%,100%{transform:perspective(300px) rotateY(0) translateY(0);}
+  50%{transform:perspective(300px) rotateY(10deg) translateY(-4px);}
+}
+
+.detail-avatar-wrap::before{
+  content:'';position:absolute;inset:-2px;border-radius:14px;
+  background:linear-gradient(135deg,#ff8c00,#9d4edd);
+  z-index:0;animation:ringRotate 4s linear infinite;
+}
+
+.detail-avatar{
+  position:relative;z-index:1;
+  width:62px;height:62px;border-radius:12px;
+  object-fit:cover;display:block;
+}
+
+.detail-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:1.3rem;font-weight:900;
+  color:#ff8c00;
+  text-shadow:0 0 12px rgba(255,140,0,0.4);
+  line-height:1.1;margin-bottom:6px;letter-spacing:1px;
+}
+
+.detail-desc{
+  font-size:0.82rem;
+  color:rgba(255,255,255,0.45);
+  line-height:1.5;
+}
+
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0;}
+.tag{
+  font-family:'JetBrains Mono',monospace;font-size:0.63rem;
+  background:rgba(255,140,0,0.07);color:#ffb347;
+  padding:4px 10px;border-radius:20px;
+  border:1px solid rgba(255,140,0,0.18);letter-spacing:0.5px;
+}
+
+.features-section{
+  background:rgba(0,0,0,0.3);border-radius:12px;
+  border:1px solid rgba(255,255,255,0.04);
+  border-left:2px solid #ff8c00;
+  padding:14px;margin-bottom:16px;
+}
+
+.features-title{
+  font-family:'JetBrains Mono',monospace;font-size:0.6rem;
+  color:#ff8c00;letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.features-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,140,0,0.3),transparent);}
+
+.feature-item{
+  display:flex;gap:10px;padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  font-size:0.82rem;color:rgba(255,255,255,0.5);
+  line-height:1.45;transition:transform 0.2s,color 0.2s;
+}
+.feature-item:hover{transform:translateX(4px);color:rgba(255,255,255,0.7);}
+.feature-item:last-child{border-bottom:none;padding-bottom:0;}
+.feature-item:first-child{padding-top:0;}
+.feature-item strong{color:#fff;}
+
+.feat-num{
+  font-family:'JetBrains Mono',monospace;font-size:0.6rem;
+  color:#ff8c00;opacity:0.45;min-width:18px;padding-top:2px;
+}
+
+.launch-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,#ff8c00,#ff4da6 60%,#9d4edd);
+  color:#fff;text-decoration:none;border-radius:12px;
+  font-family:'Orbitron',sans-serif;font-size:0.82rem;font-weight:700;
+  letter-spacing:2px;
+  box-shadow:0 4px 22px rgba(255,140,0,0.32);
+  transition:all 0.25s;position:relative;overflow:hidden;
+}
+.launch-btn::before{
+  content:'';position:absolute;top:0;left:-100%;
+  width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent);
+  transition:left 0.5s;
+}
+.launch-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,140,0,0.45);}
+.launch-btn:hover::before{left:100%;}
+.launch-btn:active{transform:scale(0.97);}
+.launch-arrow{transition:transform 0.2s;}
+.launch-btn:hover .launch-arrow{transform:translateX(4px);}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:12px;margin:24px 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.05);}
+.divider-dot{width:4px;height:4px;border-radius:50%;background:#ff8c00;opacity:0.35;}
+
+/* FOOTER */
+footer{
+  background:rgba(12,8,22,0.8);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:18px;padding:22px 18px;text-align:center;
+  backdrop-filter:blur(10px);
+}
+.footer-quote{
+  font-family:'JetBrains Mono',monospace;font-size:0.65rem;
+  color:rgba(255,255,255,0.22);line-height:1.7;margin-bottom:16px;
+}
+.footer-quote em{color:#ff8c00;font-style:normal;}
+.footer-links{display:flex;gap:10px;justify-content:center;}
+.footer-btn{
+  display:flex;align-items:center;gap:6px;
+  background:transparent;color:rgba(255,255,255,0.35);
+  text-decoration:none;padding:8px 16px;border-radius:30px;
+  font-size:0.8rem;font-weight:500;
+  border:1px solid rgba(255,255,255,0.07);
+  transition:all 0.2s;
+}
+.footer-btn:hover{border-color:rgba(255,140,0,0.35);color:#ff8c00;background:rgba(255,140,0,0.05);transform:translateY(-2px);}
+</style>
 </head>
 <body>
 
-    <div class="bg-blur"></div>
+<canvas id="bg-canvas"></canvas>
 
-    <header>
-        <h1>OWLEST</h1>
-        <p class="subtitle">| Telegram Bots |</p>
-    </header>
+<div class="wrap">
 
-    <div class="bot-selector">
-        <div class="bot-profile" onclick="showBot('zoya', this)">
-            <div class="bot-logo-frame">
-                <img src="https://files.catbox.moe/ca5km1.jpg" class="bot-img" alt="Zoya">
-            </div>
-            <span class="bot-name">Zoya AI</span>
-        </div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="owl-float">🦉</div>
+    <div class="owl-float">🦉</div>
+    <div class="owl-float">🦉</div>
+    <div class="owl-float">🦉</div>
+    <div class="owl-float">🦉</div>
+    <div class="purple-sphere"></div>
+    <div class="dot dot1"></div>
+    <div class="dot dot2"></div>
+    <div class="dot dot3"></div>
 
-        <div class="bot-profile" onclick="showBot('ghost', this)">
-            <div class="bot-logo-frame">
-                <img src="https://files.catbox.moe/5ynyru.jpg" class="bot-img" alt="Ghost Zelt">
-            </div>
-            <span class="bot-name">Shadow Stick</span>
-        </div>
-
-        <div class="bot-profile" onclick="showBot('numinfo', this)">
-            <div class="bot-logo-frame">
-                <img src="https://files.catbox.moe/dd19ju.jpg" class="bot-img" alt="NUM INFO">
-            </div>
-            <span class="bot-name">NUM INFO</span>
-        </div>
+    <div class="avatar-wrap">
+      <div class="ring-outer"></div>
+      <div class="ring-mid"></div>
+      <!-- Default: owl emoji, changes on bot select -->
+      <div class="avatar-placeholder" id="heroPlaceholder">🦉</div>
+      <img id="heroAvatar" src="" class="avatar-img" alt="" style="display:none;">
     </div>
 
-    <div class="commands-container">
-        <div id="placeholderText" class="placeholder-text">
-            <span style="font-size: 2.5rem; display: block; margin-bottom: 10px;">✨</span>
-            Select a bot to explore its universe.
-        </div>
+    <h1 class="bot-hero-name" id="heroName">OWLEST</h1>
+    <p class="bot-hero-sub" id="heroSub">Select a bot to explore ✨</p>
 
-        <div id="botHeader" class="commands-header">
-            <h2 id="botTitle">Bot Name</h2>
-            <p id="botDesc">Bot Description</p>
-            
-            <div id="botTags" class="tags-container"></div>
-
-            <div class="features-box">
-                <h4>🌟 Key Capabilities</h4>
-                <ul id="featuresList" class="features-list"></ul>
-            </div>
-
-            <a id="botLink" href="#" target="_blank" class="open-bot-btn">Launch Bot 🚀</a>
-        </div>
+    <div class="welcome-text">
+      <div class="welcome-dot"></div>
+      TELEGRAM BOT UNIVERSE
     </div>
 
-    <footer>
-        <p>"Automating the chat, one script at a time."</p>
-        <div class="footer-links">
-            <a href="https://t.me/THINKOF5" target="_blank" class="footer-btn">📢 Updates Channel</a>
-            <a href="https://t.me/redvinus" target="_blank" class="footer-btn">💬 Support Group</a>
+    <a href="https://t.me/THINKOF5" target="_blank" class="brand-btn">🦉 OWLEST 🌙</a>
+  </div>
+
+  <!-- BOT SELECTOR -->
+  <div class="section-label">Choose your bot</div>
+
+  <div class="bot-grid">
+    <div class="bot-card" onclick="showBot('zoya', this)">
+      <div class="active-pip"></div>
+      <div class="avatar-scene">
+        <div class="avatar-flipper">
+          <div class="avatar-front">
+            <img src="https://files.catbox.moe/ca5km1.jpg" class="bot-avatar" alt="Zoya AI">
+          </div>
+          <div class="avatar-back">🎀</div>
         </div>
-    </footer>
+      </div>
+      <span class="bot-label">Zoya AI</span>
+    </div>
 
-    <script>
-        // Data directly from your provided screenshots
-        const botData = {
-            zoya: {
-                title: "Zoya AI 🎀",
-                link: "https://t.me/aizoyaabot", 
-                desc: "Your Ultimate Group Assistant & Game Bot! Zoya brings an entire virtual economy and gaming experience straight to your chat.",
-                tags: ["Chat to Earn", "Economy", "Roleplay", "AI"],
-                features: [
-                    "<strong>Chat to Earn:</strong> Get paid ₹10-₹25 just for being active and sending messages/media.",
-                    "<strong>Economy & Games:</strong> Rob users, bet cash, challenge the group to RPS, and buy shields.",
-                    "<strong>Roleplay Drama:</strong> Use /slap, /hug, /kiss, and more to virtually interact with friends.",
-                    "<strong>Natural AI:</strong> Chat with Zoya naturally—just say her name or reply to her!"
-                ]
-            },
+    <div class="bot-card" onclick="showBot('ghost', this)">
+      <div class="active-pip"></div>
+      <div class="avatar-scene">
+        <div class="avatar-flipper">
+          <div class="avatar-front">
+            <img src="https://files.catbox.moe/5ynyru.jpg" class="bot-avatar" alt="Shadow Stick">
+          </div>
+          <div class="avatar-back">🦇</div>
+        </div>
+      </div>
+      <span class="bot-label">Shadow Stick</span>
+    </div>
 
-            ghost: {
-                title: "Zletbot Premium 🦇",
-                link: "https://t.me/zletbot", 
-                desc: "The most advanced Sticker & Secret Messaging toolkit for Telegram. Manage your own sticker empire and send hidden messages with style.",
-                tags: ["Sticker Tools", "Smart Whispers", "Memes", "Utility"],
-                features: [
-                    "<strong>Premium Sticker Kit:</strong> Use <code>/kang</code> to steal Static, Video, or Animated stickers into your custom packs instantly.",
-                    "<strong>Quotly & Memes:</strong> Create professional quote stickers with custom colors via <code>/q</code> and high-quality memes with <code>/mmf</code>.",
-                    "<strong>Smart Whispers:</strong> Send secret messages using <code>@bot @user</code> with target mention notifications so they never miss your whisper.",
-                    "<strong>Pack Manager:</strong> Interactive UI to view and delete your sticker volumes (Static/Video/Animated) directly with buttons."
-                ]
-            },
-            
-            numinfo: {
-                title: "NUM INFO 🕵️‍♂️",
-                link: "https://t.me/Dead_Life_x_bot", 
-                desc: "Welcome to the Dark Side of OSINT. Data. Power. Control. Built for serious users looking for fast, clean, and accurate intelligence.",
-                tags: ["OSINT", "Data Lookup", "Dark UI", "No Fake Data"],
-                features: [
-                    "<strong>Deep Lookups:</strong> Indian & Pakistan Number lookup, IP, IFSC, and IMEI.",
-                    "<strong>Gov & Auto Intelligence:</strong> PAN, GST, PAN→GST, and full Vehicle RC details.",
-                    "<strong>Social Scan:</strong> Deep Instagram profile scanning.",
-                    "<strong>Credits System:</strong> Free credits for new users + unlimited access paid plans.",
-                    "Clean formatted data with zero junk JSON spam."
-                ]
-            }
-        };
+    <div class="bot-card" onclick="showBot('numinfo', this)">
+      <div class="active-pip"></div>
+      <div class="avatar-scene">
+        <div class="avatar-flipper">
+          <div class="avatar-front">
+            <img src="https://files.catbox.moe/dd19ju.jpg" class="bot-avatar" alt="NUM INFO">
+          </div>
+          <div class="avatar-back">🕵️</div>
+        </div>
+      </div>
+      <span class="bot-label">NUM INFO</span>
+    </div>
+  </div>
 
-        function showBot(botId, element) {
-            document.querySelectorAll('.bot-profile').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
+  <!-- PLACEHOLDER -->
+  <div id="placeholder" class="placeholder">
+    <span class="placeholder-icon">🌌</span>
+    <p>Tap a bot above to explore its universe</p>
+  </div>
 
-            document.getElementById('placeholderText').style.display = 'none';
-            document.getElementById('botHeader').style.display = 'block';
+  <!-- DETAIL -->
+  <div id="botDetail" class="bot-detail">
+    <div class="detail-card">
+      <div class="detail-topbar"></div>
+      <div class="detail-body">
+        <div class="detail-header">
+          <div class="detail-avatar-wrap">
+            <img id="detailAvatar" src="" class="detail-avatar" alt="">
+          </div>
+          <div>
+            <div id="detailTitle" class="detail-title"></div>
+            <p id="detailDesc" class="detail-desc"></p>
+          </div>
+        </div>
+        <div id="detailTags" class="tags"></div>
+        <div class="features-section">
+          <div class="features-title">Key Capabilities</div>
+          <div id="featuresList"></div>
+        </div>
+        <a id="launchBtn" href="#" target="_blank" class="launch-btn">
+          🦉 LAUNCH BOT <span class="launch-arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
 
-            const data = botData[botId];
-            document.getElementById('botTitle').innerHTML = data.title;
-            document.getElementById('botDesc').innerText = data.desc;
-            document.getElementById('botLink').href = data.link; 
+  <div class="divider"><div class="divider-dot"></div></div>
 
-            const tagsContainer = document.getElementById('botTags');
-            tagsContainer.innerHTML = '';
-            data.tags.forEach(tag => {
-                tagsContainer.innerHTML += `<span class="tech-tag">${tag}</span>`;
-            });
+  <footer>
+    <p class="footer-quote">"Automating the chat,<br><em>one script at a time.</em>"</p>
+    <div class="footer-links">
+      <a href="https://t.me/THINKOF5" target="_blank" class="footer-btn">📢 Updates</a>
+      <a href="https://t.me/redvinus" target="_blank" class="footer-btn">💬 Support</a>
+    </div>
+  </footer>
+</div>
 
-            const featuresList = document.getElementById('featuresList');
-            featuresList.innerHTML = '';
-            data.features.forEach(feature => {
-                featuresList.innerHTML += `<li>${feature}</li>`;
-            });
-        }
-    </script>
-</body>
-</html>
+<script>
+// THREE.JS STARFIELD
+(function(){
+  const canvas = document.getElementById('bg-canvas');
+  const renderer = new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+  camera.position.z = 30;
+
+  const count = 220;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count*3);
+  for(let i=0;i<count;i++){
+    pos[i*3]=(Math.random()-0.5)*100;
+    pos[i*3+1]=(Math.random()-0.5)*100;
+    pos[i*3+2]=(Math.random()-0.5)*50;
+  }
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const mat = new THREE.PointsMaterial({color:0xffffff,size:0.1,transparent:true,opacity:0.45});
+  const stars = new THREE.Points(geo,mat);
+  scene.add(stars);
+
+  const tGeo = new THREE.TorusGeometry(16,0.05,8,100);
+  const tMat = new THREE.MeshBasicMaterial({color:0xff8c00,transparent:true,opacity:0.07});
+  const torus = new THREE.Mesh(tGeo,tMat);
+  torus.rotation.x = Math.PI/4;
+  scene.add(torus);
+
+  const t2Geo = new THREE.TorusGeometry(11,0.04,8,80);
+  const t2Mat = new THREE.MeshBasicMaterial({color:0x9d4edd,transparent:true,opacity:0.06});
+  const torus2 = new THREE.Mesh(t2Geo,t2Mat);
+  torus2.rotation.x = -Math.PI/3;
+  scene.add(torus2);
+
+  window.addEventListener('resize',()=>{
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+  });
+
+  let t=0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t+=0.004;
+    stars.rotation.y=t*0.04;
+    torus.rotation.z+=0.0006;
+    torus2.rotation.z-=0.0007;
+    renderer.render(scene,camera);
+  }
+  animate();
+})();
+
+// 3D TILgm
