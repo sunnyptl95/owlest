@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OWLEST — Intelligence that lives where you already are</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --bg: #f5f6fb;
+    --bg-alt: #eceef7;
+    --card: #ffffff;
+    --ink: #12131a;
+    --ink-soft: #4d4e5c;
+    --violet: #6c4fd1;
+    --violet-soft: #ab97ec;
+    --gold: #c9821f;
+    --line: #d7d9e6;
+    --nav-bg: rgba(245,246,251,0.88);
+    --sky-top: #d9def5;
+    --sky-bot: #f3ead9;
+  }
+
+  html[data-theme="dark"]{
+    --bg: #0b0b12;
+    --bg-alt: #14141d;
+    --card: #14141d;
+    --ink: #f1f1f6;
+    --ink-soft: #b3b4c4;
+    --violet: #a284ff;
+    --violet-soft: #6c4fd1;
+    --gold: #f0b94d;
+    --line: #26262f;
+    --nav-bg: rgba(11,11,18,0.88);
+    --sky-top: #0e1730;
+    --sky-bot: #241a2e;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    transition: background .5s ease, color .5s ease;
+  }
+
+  h1, h2, h3{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    line-height: 1.08;
+    margin: 0;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  a{ color: inherit; }
+  .wrap{ max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+
+  /* ---------- NAV ---------- */
+
+  nav{
+    position: fixed; top:0; left:0; right:0; z-index: 100;
+    padding: 22px 32px;
+    display:flex; justify-content: space-between; align-items:center; gap: 16px;
+    transition: background .4s ease, padding .4s ease, box-shadow .4s ease;
+  }
+  nav.scrolled{
+    background: var(--nav-bg);
+    backdrop-filter: blur(10px);
+    padding: 14px 32px;
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .wordmark{
+    font-family:'Fraunces', serif; font-size: clamp(18px, 2.4vw, 22px); font-weight: 700;
+    text-decoration:none; display:flex; align-items:center; gap:8px; color: var(--ink);
+  }
+  .wordmark svg{ width:22px; height:22px; flex-shrink:0; }
+  .nav-right{ display:flex; align-items:center; gap: 22px; }
+  nav .nav-link{ font-size: 15px; font-weight: 500; text-decoration:none; border-bottom: 1px solid var(--ink); padding-bottom: 2px; white-space: nowrap; transition: color .25s ease, border-color .25s ease; }
+  nav .nav-link:hover{ color: var(--violet); border-color: var(--violet); }
+
+  .theme-toggle{
+    width: 44px; height: 25px; border-radius: 20px; border: 1px solid var(--ink-soft);
+    background: transparent; position: relative; cursor: pointer; padding: 0; flex-shrink: 0;
+  }
+  .theme-toggle .knob{
+    position:absolute; top: 2px; left: 2px; width: 19px; height: 19px; border-radius: 50%;
+    background: var(--violet); transition: transform .35s cubic-bezier(.2,.7,.2,1), background .35s ease;
+  }
+  html[data-theme="dark"] .theme-toggle .knob{ transform: translateX(19px); background: var(--gold); }
+
+  .icon-toggle{
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--ink-soft); background: transparent;
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer; color: var(--ink-soft); flex-shrink:0;
+    transition: color .3s ease, border-color .3s ease;
+  }
+  .icon-toggle.on{ color: var(--violet); border-color: var(--violet); }
+  .icon-toggle .wave{ opacity: 0.25; transition: opacity .3s ease; }
+  .icon-toggle.on .wave{ opacity: 1; }
+
+  /* ---------- OWL ZOOM SCENE ---------- */
+
+  .owl-scroll{ position: relative; height: 320vh; }
+  .owl-sticky{
+    position: sticky; top:0; height: 100svh;
+    overflow: hidden; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(var(--sky-top), var(--sky-bot));
+  }
+  .owl-sticky svg{ width: 100%; height: 100%; display:block; }
+
+  .eye-open{
+    opacity: 0;
+    transform-box: fill-box; transform-origin: center;
+    transform: scale(0.35);
+    transition: opacity .6s ease, transform .6s cubic-bezier(.2,.8,.3,1);
+  }
+  .eyelid{ transition: opacity .45s ease; transform-box: fill-box; transform-origin: center; }
+  #owlSvg.eyes-open .eye-open{ opacity: 1; transform: scale(1); }
+  #owlSvg.eyes-open .eyelid{ opacity: 0; }
+
+  .fireflies circle{ transition: opacity .8s ease; }
+
+  .owl-overlay{
+    position:absolute; inset:0; z-index: 5;
+    display:flex; flex-direction: column; justify-content: flex-start; align-items:flex-start;
+    padding: 110px 32px 0; pointer-events:none;
+  }
+  .owl-overlay .intro{ max-width: 460px; transition: opacity .4s ease, transform .4s ease; }
+  .owl-overlay h1{ font-size: clamp(28px, 5.4vw, 54px); }
+  .owl-overlay p{ margin-top: 16px; color: var(--ink-soft); font-size: clamp(15px, 2vw, 18px); max-width: 38ch; }
+
+  .scroll-hint{
+    position:absolute; bottom: 40px; left: 32px; z-index: 5;
+    font-size: 13.5px; font-weight: 500; color: var(--ink-soft);
+    display:flex; align-items:center; gap:10px;
+    transition: opacity .4s ease;
+  }
+  .scroll-hint .stem{
+    width:1px; height: 30px; background: var(--ink-soft);
+    transform-origin: top; animation: stretch 2.4s ease-in-out infinite;
+  }
+  @keyframes stretch{ 0%,100%{ transform: scaleY(0.4); opacity:.4;} 50%{ transform: scaleY(1); opacity: 1;} }
+
+  .awake-caption{
+    position:absolute; bottom: 64px; left:0; right:0; z-index: 5;
+    text-align:center; opacity:0; transform: translateY(14px);
+    transition: opacity .6s ease, transform .6s ease;
+    font-family:'Fraunces', serif; font-style:italic; font-size: clamp(18px,3vw,26px); color: var(--ink);
+  }
+  .awake-caption.show{ opacity:1; transform: translateY(0); }
+
+  /* ---------- NORMAL SECTIONS ---------- */
+
+  section.plain{ position: relative; padding: clamp(70px, 12vw, 120px) 0; }
+  .section-alt{ background: var(--bg-alt); }
+
+  .reveal{ opacity:0; transform: translateY(26px); transition: opacity .8s ease, transform .8s cubic-bezier(.16,.8,.24,1); }
+  .reveal.in{ opacity:1; transform: translateY(0); }
+
+  .eyebrow{ font-size: 14.5px; font-weight: 600; color: var(--violet); margin-bottom: 14px; display:flex; align-items:center; gap:8px; }
+  .eyebrow .dot{ width:7px; height:7px; border-radius:50%; background: var(--gold); }
+
+  h2.section-title{ font-size: clamp(26px, 4vw, 44px); max-width: 16ch; }
+
+  .philosophy-grid{ margin-top: 46px; display:grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .philosophy-grid p{ color: var(--ink-soft); font-size: clamp(15.5px, 1.8vw, 17.5px); }
+  .stack-line{ margin-top: 24px; font-size: 15px; font-weight: 500; color: var(--ink); border-top: 1px solid var(--line); padding-top: 16px; }
+
+  .zoya-row{
+    margin-top: 46px; display:grid; grid-template-columns: 0.9fr 1.4fr; gap: 50px; align-items:center;
+    padding: clamp(30px,5vw,50px) 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  }
+  .zoya-row .glyph{ display:flex; justify-content:center; }
+  .zoya-row .glyph svg{ width: clamp(56px, 8vw, 96px); height:auto; }
+  .row-name{ font-size: clamp(22px, 3vw, 32px); margin-bottom: 12px; }
+  .row-desc{ color: var(--ink-soft); font-size: clamp(15px, 1.8vw, 17px); max-width: 48ch; }
+  .row-tag{ margin-top: 14px; font-size: 13.5px; font-weight: 600; color: var(--gold); }
+
+  .project-btn{
+    display:inline-flex; align-items:center; gap: 8px;
+    margin-top: 22px; padding: 11px 20px; border-radius: 4px;
+    border: 1px solid var(--ink); color: var(--ink);
+    text-decoration:none; font-size: 14.5px; font-weight: 600;
+    transition: color .25s ease, border-color .25s ease, background .25s ease;
+  }
+  .project-btn:hover{ border-color: var(--violet); color: var(--violet); background: color-mix(in srgb, var(--violet) 8%, transparent); }
+  .project-btn:active{ transform: scale(0.95); }
+
+  footer{ padding: clamp(60px,10vw,90px) 0 60px; }
+  footer .foot-grid{ display:flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 40px; }
+  footer h2{ font-size: clamp(24px, 4vw, 40px); max-width: 14ch; }
+  .foot-links{ display:flex; flex-direction: column; gap: 10px; }
+  .foot-links a{ text-decoration:none; font-size: 15.5px; font-weight: 500; border-bottom: 1px solid transparent; transition: color .25s ease, border-color .25s ease; }
+  .foot-links a:hover{ color: var(--violet); border-color: var(--violet); }
+  .foot-bottom{ margin-top: 50px; display:flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 13.5px; color: var(--ink-soft); }
+
+  @media (max-width: 780px){
+    .philosophy-grid{ grid-template-columns: 1fr; gap: 26px; }
+    .zoya-row{ grid-template-columns: 1fr; gap: 20px; }
+    .zoya-row .glyph{ justify-content: flex-start; }
+    .owl-overlay{ padding-top: 90px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .owl-scroll{ height: auto; }
+    .owl-sticky{ position: static; height: 70vh; }
+    .reveal{ transition: opacity .4s ease; transform:none !important; }
+    .scroll-hint .stem{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#top" class="wordmark">
+    <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="19" stroke="currentColor" stroke-width="1.4"/><circle cx="20" cy="20" r="6" fill="currentColor"/></svg>
+    OWLEST
+  </a>
+  <div class="nav-right">
+    <button class="icon-toggle" id="soundToggle" aria-label="Toggle sound" title="Sound">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 9v6h4l5 4V5L8 9H4z"/>
+        <path class="wave" d="M16.5 8.5a5 5 0 010 7"/>
+      </svg>
+    </button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark theme"><span class="knob"></span></button>
+    <a href="#contact" class="nav-link">Contact</a>
+  </div>
+</nav>
+
+<div id="top" class="owl-scroll">
+  <div class="owl-sticky">
+
+    <svg id="owlSvg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <radialGradient id="moon" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="var(--gold)" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="var(--gold)" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- sky decor -->
+      <circle cx="150" cy="110" r="55" fill="url(#moon)"/>
+      <g class="fireflies">
+        <circle cx="620" cy="180" r="3" fill="var(--gold)" opacity="0"/>
+        <circle cx="700" cy="260" r="2.4" fill="var(--gold)" opacity="0"/>
+        <circle cx="380" cy="140" r="2.6" fill="var(--gold)" opacity="0"/>
+        <circle cx="560" cy="90" r="2" fill="var(--gold)" opacity="0"/>
+      </g>
+
+      <!-- distant hill -->
+      <path d="M0,430 Q250,370 500,420 T1000,400 V600 H0 Z" fill="var(--ink)" opacity="0.06"/>
+
+      <!-- tree -->
+      <path d="M470,600 L480,340 Q485,320 500,318 Q515,320 520,340 L530,600 Z" fill="var(--ink)" opacity="0.85"/>
+      <path d="M500,340 Q380,300 300,330" stroke="var(--ink)" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.85"/>
+      <path d="M500,335 Q640,290 730,320" stroke="var(--ink)" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.85"/>
+
+      <!-- owl -->
+      <g id="owl">
+        <ellipse cx="500" cy="345" rx="66" ry="78" fill="var(--violet)"/>
+        <path d="M446,300 Q460,250 480,290 Z" fill="var(--violet)"/>
+        <path d="M554,300 Q540,250 520,290 Z" fill="var(--violet)"/>
+        <ellipse cx="500" cy="360" rx="46" ry="52" fill="var(--card)"/>
+
+        <!-- eyes -->
+        <g class="eye eye-left">
+          <path class="eyelid" d="M462,340 Q478,326 494,340" stroke="var(--ink)" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <g class="eye-open">
+            <circle cx="478" cy="342" r="17" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+            <circle cx="478" cy="342" r="9.5" fill="var(--gold)"/>
+            <circle cx="478" cy="342" r="4" fill="var(--ink)"/>
+          </g>
+        </g>
+        <g class="eye eye-right">
+          <path class="eyelid" d="M506,340 Q522,326 538,340" stroke="var(--ink)" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <g class="eye-open">
+            <circle cx="522" cy="342" r="17" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+            <circle cx="522" cy="342" r="9.5" fill="var(--gold)"/>
+            <circle cx="522" cy="342" r="4" fill="var(--ink)"/>
+          </g>
+        </g>
+
+        <path d="M492,368 L500,380 L508,368 Z" fill="var(--gold)"/>
+        <path d="M470,398 Q500,412 530,398" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.5"/>
+      </g>
+    </svg>
+
+    <div class="owl-overlay">
+      <div class="intro" id="heroIntro">
+        <h1>Intelligence that lives where you already are.</h1>
+        <p>OWLEST builds software that works from inside the conversations and communities you're already part of — not another app, not another tab.</p>
+      </div>
+    </div>
+
+    <div class="scroll-hint" id="scrollHint"><span class="stem"></span> Scroll to wake her up</div>
+    <div class="awake-caption" id="awakeCaption">Always watching.</div>
+
+  </div>
+</div>
+
+<section class="plain" id="philosophy">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="dot"></span>How we build</div>
+    <h2 class="section-title">Small systems, run by one person, held to a company's standard.</h2>
+    <div class="philosophy-grid">
+      <p>Every system we build starts with a real, specific need — a community that needed a steadier hand, a conversation that needed a fact checked in real time. We'd rather ship one thing that actually works than five that look good in a pitch deck.</p>
+      <div>
+        <p>The stack stays deliberately plain — nothing that needs a platform team to keep running, everything a single developer can reason about end to end.</p>
+        <div class="stack-line">Python &amp; FastAPI · MongoDB · Pyrogram · deployed on Render and Netlify</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="plain section-alt" id="products">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="dot"></span>What we've built</div>
+    <h2 class="section-title">One system, live in Telegram.</h2>
+
+    <div class="zoya-row">
+      <div class="glyph">
+        <svg viewBox="0 0 100 100"><path d="M50 10 C 20 10 10 40 10 60 C 10 82 30 92 50 92 C 70 92 90 82 90 60 C 90 40 80 10 50 10 Z" fill="none" stroke="var(--ink)" stroke-width="2"/><circle cx="36" cy="52" r="8" fill="var(--violet)"/><circle cx="64" cy="52" r="8" fill="var(--violet)"/><path d="M42 72 Q50 80 58 72" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>
+      </div>
+      <div>
+        <h3 class="row-name">Zoya</h3>
+        <p class="row-desc">An AI assistant built for Telegram groups. Zoya holds a real conversation in Hinglish, pulls in live search when a claim needs checking, and helps keep an eye on the group so moderators aren't doing it all by hand.</p>
+        <div class="row-tag">Live search · group-aware · currently on Telegram</div>
+        <a href="zoya.html" target="_blank" rel="noopener" class="project-btn" id="zoyaProjectBtn">View the project<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-left:2px;"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+      </div>
+    </div>
+
+    <p style="margin-top:32px; color:var(--ink-soft); font-size:15px;">More systems are in progress. This page will grow as they ship.</p>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap reveal">
+    <div class="foot-grid">
+      <h2>Have something that should live in a chat window?</h2>
+      <div class="foot-links">
+        <a href="https://t.me/OgAuraMan" target="_blank" rel="noopener">Telegram — @OgAuraMan</a>
+        <a href="https://github.com/sunnyptl95" target="_blank" rel="noopener">GitHub — sunnyptl95</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>OWLEST</span>
+      <span>Built from Gujarat, running everywhere Telegram does.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // theme toggle
+  const root = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  const stored = localStorage.getItem('owlest-theme');
+  if (stored) root.setAttribute('data-theme', stored);
+  toggle.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('owlest-theme', next);
+  });
+
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- sound (synthesized, no external audio files) ----
+  const soundToggle = document.getElementById('soundToggle');
+  let audioCtx = null;
+  let soundOn = true;
+  soundToggle.classList.add('on');
+
+  function ensureCtx(){
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  // browsers block audio until a real user gesture — unlock silently on first interaction
+  function unlockOnce(){
+    if (soundOn) ensureCtx();
+    window.removeEventListener('click', unlockOnce);
+    window.removeEventListener('touchstart', unlockOnce);
+    window.removeEventListener('keydown', unlockOnce);
+    window.removeEventListener('scroll', unlockOnce);
+  }
+  window.addEventListener('click', unlockOnce);
+  window.addEventListener('touchstart', unlockOnce);
+  window.addEventListener('keydown', unlockOnce);
+  window.addEventListener('scroll', unlockOnce, { passive: true });
+
+  function tone(freqStart, freqEnd, startTime, duration, peakGain){
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freqStart, startTime);
+    osc.frequency.exponentialRampToValueAtTime(freqEnd, startTime + duration);
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.exponentialRampToValueAtTime(peakGain, startTime + duration * 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.05);
+  }
+
+  function playHoot(){
+    if (!soundOn || !audioCtx) return;
+    const now = audioCtx.currentTime;
+    tone(520, 230, now, 0.4, 0.4);
+    tone(400, 170, now + 0.28, 0.45, 0.35);
+  }
+
+  soundToggle.addEventListener('click', () => {
+    soundOn = !soundOn;
+    soundToggle.classList.toggle('on', soundOn);
+    if (soundOn) ensureCtx();
+  });
+
+  // ---- owl zoom scene ----
+  const owlScroll = document.querySelector('.owl-scroll');
+  const owlSvg = document.getElementById('owlSvg');
+  const heroIntro = document.getElementById('heroIntro');
+  const scrollHint = document.getElementById('scrollHint');
+  const awakeCaption = document.getElementById('awakeCaption');
+  const fireflies = document.querySelectorAll('.fireflies circle');
+
+  const baseVB = { x: 0, y: 0, w: 1000, h: 600 };
+  const zoomVB = { x: 420, y: 250, w: 160, h: 120 }; // framed on the owl's face
+
+  function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+  function lerp(a, b, t){ return a + (b - a) * t; }
+  function smoothstep(t){ return t * t * (3 - 2 * t); }
+
+  let ticking = false;
+  let eyesWereOpen = false;
+
+  function updateOwl(){
+    const rect = owlScroll.getBoundingClientRect();
+    const total = owlScroll.offsetHeight - window.innerHeight;
+    const scrolled = clamp(-rect.top, 0, Math.max(total, 1));
+    const raw = total > 0 ? scrolled / total : 0;
+    const t = smoothstep(raw);
+
+    if (!reduceMotion){
+      const x = lerp(baseVB.x, zoomVB.x, t);
+      const y = lerp(baseVB.y, zoomVB.y, t);
+      const w = lerp(baseVB.w, zoomVB.w, t);
+      const h = lerp(baseVB.h, zoomVB.h, t);
+      owlSvg.setAttribute('viewBox', `${x.toFixed(1)} ${y.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`);
+    }
+
+    heroIntro.style.opacity = clamp(1 - raw * 3.2, 0, 1);
+    scrollHint.style.opacity = clamp(1 - raw * 4, 0, 1);
+
+    fireflies.forEach((f, i) => { f.style.opacity = clamp((raw - 0.25) * 2, 0, 0.85); });
+
+    const eyesOpenNow = raw > 0.86;
+    if (eyesOpenNow && !eyesWereOpen) playHoot();
+    eyesWereOpen = eyesOpenNow;
+
+    owlSvg.classList.toggle('eyes-open', eyesOpenNow);
+    awakeCaption.classList.toggle('show', raw > 0.9);
+
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking){ requestAnimationFrame(updateOwl); ticking = true; }
+  }, { passive: true });
+  window.addEventListener('resize', updateOwl);
+  updateOwl();
+
+  // ---- simple reveal for normal sections ----
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.2 });
+  reveals.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
