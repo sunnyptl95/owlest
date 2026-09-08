@@ -97,17 +97,6 @@
   }
   html[data-theme="dark"] .theme-toggle .knob{ transform: translateX(19px); background: var(--gold); }
 
-  .icon-toggle{
-    width: 36px; height: 36px; border-radius: 50%;
-    border: 1px solid var(--ink-soft); background: transparent;
-    display:flex; align-items:center; justify-content:center;
-    cursor: pointer; color: var(--ink-soft); flex-shrink:0;
-    transition: color .3s ease, border-color .3s ease;
-  }
-  .icon-toggle.on{ color: var(--violet); border-color: var(--violet); }
-  .icon-toggle .wave{ opacity: 0.25; transition: opacity .3s ease; }
-  .icon-toggle.on .wave{ opacity: 1; }
-
   /* ---------- OWL ZOOM SCENE ---------- */
 
   .owl-scroll{ position: relative; height: 320vh; }
@@ -196,6 +185,41 @@
   .project-btn:hover{ border-color: var(--violet); color: var(--violet); background: color-mix(in srgb, var(--violet) 8%, transparent); }
   .project-btn:active{ transform: scale(0.95); }
 
+  /* ---------- ABOUT ---------- */
+  .about-grid{ margin-top: 46px; display:grid; grid-template-columns: 0.85fr 1.15fr; gap: 60px; align-items: start; }
+  .about-grid p{ color: var(--ink-soft); font-size: clamp(15.5px, 1.8vw, 17.5px); }
+  .about-grid p + p{ margin-top: 14px; }
+  .skill-chips{ margin-top: 22px; display:flex; flex-wrap:wrap; gap: 9px; }
+  .skill-chip{
+    padding: 7px 15px; border-radius: 30px; border: 1px solid var(--line);
+    font-size: 13.5px; font-weight: 500; color: var(--ink-soft);
+  }
+
+  /* ---------- WORK (other projects) ---------- */
+  .work-grid{ margin-top: 46px; display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .work-card{
+    border: 1px solid var(--line); border-radius: 8px; padding: 26px;
+    background: var(--card);
+    opacity: 0; transform: translateY(20px);
+    transition: opacity .6s ease, transform .6s cubic-bezier(.16,.8,.24,1);
+  }
+  .work-card.in{ opacity: 1; transform: translateY(0); }
+  .work-head{ display:flex; justify-content: space-between; align-items:flex-start; gap: 12px; }
+  .work-card h3{ font-size: 20px; }
+  .status-badge{
+    flex-shrink:0; font-size: 11.5px; font-weight: 700; letter-spacing: .03em;
+    padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+    border: 1px solid var(--line); color: var(--ink-soft);
+  }
+  .status-badge.progress{ color: var(--gold); border-color: var(--gold); }
+  .status-badge.prototype{ color: var(--violet); border-color: var(--violet); }
+  .work-desc{ margin-top: 10px; color: var(--ink-soft); font-size: 14.5px; }
+
+  @media (max-width: 780px){
+    .about-grid{ grid-template-columns: 1fr; gap: 26px; }
+    .work-grid{ grid-template-columns: 1fr; }
+  }
+
   footer{ padding: clamp(60px,10vw,90px) 0 60px; }
   footer .foot-grid{ display:flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 40px; }
   footer h2{ font-size: clamp(24px, 4vw, 40px); max-width: 14ch; }
@@ -227,13 +251,8 @@
     OWLEST
   </a>
   <div class="nav-right">
-    <button class="icon-toggle" id="soundToggle" aria-label="Toggle sound" title="Sound">
-      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 9v6h4l5 4V5L8 9H4z"/>
-        <path class="wave" d="M16.5 8.5a5 5 0 010 7"/>
-      </svg>
-    </button>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark theme"><span class="knob"></span></button>
+    <a href="#work" class="nav-link">Work</a>
     <a href="#contact" class="nav-link">Contact</a>
   </div>
 </nav>
@@ -312,12 +331,33 @@
 <section class="plain" id="philosophy">
   <div class="wrap reveal">
     <div class="eyebrow"><span class="dot"></span>How we build</div>
-    <h2 class="section-title">Small systems, run by one person, held to a company's standard.</h2>
+    <h2 class="section-title">Small systems, built by one student, one at a time.</h2>
     <div class="philosophy-grid">
-      <p>Every system we build starts with a real, specific need — a community that needed a steadier hand, a conversation that needed a fact checked in real time. We'd rather ship one thing that actually works than five that look good in a pitch deck.</p>
+      <p>Every system here starts with a real, specific need — a community that needed a steadier hand, a conversation that needed a fact checked in real time. Better to ship one thing that actually works than five half-finished ones.</p>
       <div>
         <p>The stack stays deliberately plain — nothing that needs a platform team to keep running, everything a single developer can reason about end to end.</p>
         <div class="stack-line">Python &amp; FastAPI · MongoDB · Pyrogram · deployed on Render and Netlify</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="plain" id="about">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="dot"></span>The builder</div>
+    <h2 class="section-title">One developer, not a department.</h2>
+    <div class="about-grid">
+      <p>OWLEST is a personal brand run by Sunny — a Computer Applications &amp; IT student from Gujarat who builds Telegram bots, web apps, and desktop tools end to end, from backend to interface, on a regular laptop in his own time.</p>
+      <div>
+        <p>Everything on this site is written, deployed, and maintained solo, alongside college — which means slower progress than a full-time team, but also no gap between an idea and the thing that actually ships.</p>
+        <div class="skill-chips">
+          <span class="skill-chip">Python</span>
+          <span class="skill-chip">FastAPI</span>
+          <span class="skill-chip">MongoDB</span>
+          <span class="skill-chip">Pyrogram</span>
+          <span class="skill-chip">JavaScript</span>
+          <span class="skill-chip">PyQt6</span>
+        </div>
       </div>
     </div>
   </div>
@@ -344,12 +384,46 @@
   </div>
 </section>
 
+<section class="plain" id="work">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="dot"></span>In the workshop</div>
+    <h2 class="section-title">What's currently being built.</h2>
+    <p class="lede" style="margin-top:16px; color:var(--ink-soft); font-size:15.5px; max-width:60ch;">Not everything here is live yet. These are real, working code — just not polished enough to call finished.</p>
+
+    <div class="work-grid">
+      <div class="work-card">
+        <div class="work-head">
+          <h3>Hoots</h3>
+          <span class="status-badge prototype">Prototype</span>
+        </div>
+        <p class="work-desc">A music streaming PWA built with FastAPI, MongoDB, and yt-dlp — playlists, recommendations, and an admin dashboard. Currently blocked on YouTube's bot detection on datacenter IPs, so it's not publicly deployed yet.</p>
+      </div>
+
+      <div class="work-card">
+        <div class="work-head">
+          <h3>Athena</h3>
+          <span class="status-badge progress">In progress</span>
+        </div>
+        <p class="work-desc">An offline desktop AI agent for Windows, running a local model through Ollama with a JARVIS-style PyQt6 dashboard and system-control tools. No cloud, no API calls — everything runs on-device.</p>
+      </div>
+
+      <div class="work-card">
+        <div class="work-head">
+          <h3>Voice for Zoya</h3>
+          <span class="status-badge progress">In progress</span>
+        </div>
+        <p class="work-desc">An early build exploring voice replies inside Telegram group calls for Zoya — wake-word detection and live speech-to-text. Not part of the live bot yet; the current Zoya you can talk to today is text-only.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer id="contact">
   <div class="wrap reveal">
     <div class="foot-grid">
       <h2>Have something that should live in a chat window?</h2>
       <div class="foot-links">
-        <a href="https://t.me/OgAuraMan" target="_blank" rel="noopener">Telegram — @OgAuraMan</a>
+        <a href="https://t.me/OgAuraMan" target="_blank" rel="noopener">Telegram</a>
         <a href="https://github.com/sunnyptl95" target="_blank" rel="noopener">GitHub — sunnyptl95</a>
       </div>
     </div>
@@ -379,11 +453,8 @@
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ---- sound (synthesized, no external audio files) ----
-  const soundToggle = document.getElementById('soundToggle');
+  // ---- sound (synthesized, no external audio files, always on) ----
   let audioCtx = null;
-  let soundOn = true;
-  soundToggle.classList.add('on');
 
   function ensureCtx(){
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -392,7 +463,7 @@
 
   // browsers block audio until a real user gesture — unlock silently on first interaction
   function unlockOnce(){
-    if (soundOn) ensureCtx();
+    ensureCtx();
     window.removeEventListener('click', unlockOnce);
     window.removeEventListener('touchstart', unlockOnce);
     window.removeEventListener('keydown', unlockOnce);
@@ -419,17 +490,11 @@
   }
 
   function playHoot(){
-    if (!soundOn || !audioCtx) return;
+    if (!audioCtx) return;
     const now = audioCtx.currentTime;
     tone(520, 230, now, 0.4, 0.4);
     tone(400, 170, now + 0.28, 0.45, 0.35);
   }
-
-  soundToggle.addEventListener('click', () => {
-    soundOn = !soundOn;
-    soundToggle.classList.toggle('on', soundOn);
-    if (soundOn) ensureCtx();
-  });
 
   // ---- owl zoom scene ----
   const owlScroll = document.querySelector('.owl-scroll');
@@ -486,7 +551,7 @@
   updateOwl();
 
   // ---- simple reveal for normal sections ----
-  const reveals = document.querySelectorAll('.reveal');
+  const reveals = document.querySelectorAll('.reveal, .work-card');
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
   }, { threshold: 0.2 });
